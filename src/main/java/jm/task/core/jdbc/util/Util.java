@@ -1,27 +1,42 @@
 package jm.task.core.jdbc.util;
 
+
+import jm.task.core.jdbc.model.User;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
+
 
 public class Util {
-    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String HOST = "jdbc:mysql://localhost:3306/mydbtest";
-    private static final String LOGIN = "root";
-    private static final String PASSWORD = "Root12345678";
+    static SessionFactory sessionFactory;
 
-    public static Connection getConnection() {
+    public static SessionFactory getSessionFactory() {
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/mydbtest");
+        properties.setProperty("dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.setProperty("hibernate.connection.username", "root");
+        properties.setProperty("hibernate.connection.password", "Root12345678");
+        properties.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
+
+
+        sessionFactory = new Configuration().addAnnotatedClass(User.class).addProperties(properties).buildSessionFactory();
+        return sessionFactory;
+    }
+
+    public static Connection connect() {
         Connection connection = null;
         try {
-            Class.forName(DRIVER);
-            connection = DriverManager.getConnection(HOST, LOGIN, PASSWORD);
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "rootroot");
+        } catch (SQLException e) {
+            System.out.println("Нет соединения !");
         }
         return connection;
     }
 }
-
 
 
 
