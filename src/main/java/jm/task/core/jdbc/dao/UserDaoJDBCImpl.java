@@ -10,24 +10,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+// Закрытие ststement убрал
+// Util.getconnection() записал в переменную и теперь вызываю методы у этой переменной
 
 public class UserDaoJDBCImpl implements UserDao {
-
+    private final Connection connection = Util.getConnection();
     public UserDaoJDBCImpl() {
 
     }
     public void createUsersTable() {
         try  {
-            Util.getConnection().setAutoCommit(false);
+            connection.setAutoCommit(false);
             Statement statement = Util.getConnection().createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS users " +
                     "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(60), last_name VARCHAR(60), age INT)");
-            Util.getConnection().commit();
-            statement.close();
-            Util.getConnection().close();
+            connection.commit();
+            connection.close();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -38,15 +39,14 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
         try  {
-            Util.getConnection().setAutoCommit(false);
+            connection.setAutoCommit(false);
             Statement statement = Util.getConnection().createStatement();
             statement.executeUpdate("DROP TABLE IF EXISTS users");
-            Util.getConnection().commit();
-            statement.close();
-            Util.getConnection().close();
+            connection.commit();
+            connection.close();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -57,18 +57,17 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         try  {
-            Util.getConnection().setAutoCommit(false);
+            connection.setAutoCommit(false);
             PreparedStatement pstm = Util.getConnection().prepareStatement("INSERT INTO users (name, last_name, age) VALUES (?, ?, ?)");
             pstm.setString(1, name);
             pstm.setString(2, lastName);
             pstm.setByte(3, age);
             pstm.executeUpdate();
-            Util.getConnection().commit();
-            pstm.close();
-            Util.getConnection().close();
+            connection.commit();
+            connection.close();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -79,16 +78,15 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         try  {
-            Util.getConnection().setAutoCommit(false);
+            connection.setAutoCommit(false);
             PreparedStatement pstm = Util.getConnection().prepareStatement("DELETE FROM users WHERE id = ?");
             pstm.setLong(1, id);
             pstm.executeUpdate();
-            Util.getConnection().commit();
-            pstm.close();
-            Util.getConnection().close();
+            connection.commit();
+            connection.close();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -107,13 +105,12 @@ public class UserDaoJDBCImpl implements UserDao {
                         resultSet.getString("last_name"), resultSet.getByte("age"));
                 user.setId(resultSet.getLong("id"));
                 users.add(user);
-                Util.getConnection().commit();
-                resultSet.close();
-                Util.getConnection().close();
+                connection.commit();
+                connection.close();
             }
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -127,15 +124,14 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         try  {
+            connection.setAutoCommit(false);
             Statement statement = Util.getConnection().createStatement();
-            Util.getConnection().setAutoCommit(false);
             statement.executeUpdate("TRUNCATE TABLE users");
-            Util.getConnection().commit();
-            statement.close();
-            Util.getConnection().close();
+            connection.commit();
+            connection.close();
         } catch (SQLException e) {
             try {
-                Util.getConnection().rollback();
+                connection.rollback();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
